@@ -35,11 +35,11 @@ export default function NotificationDropdown({
     switch (type) {
       case "URGENT":
       case "OVERDUE":
-        return <AlertTriangle size={14} className="text-red-400 shrink-0" />;
+        return <AlertTriangle size={16} className="text-red-400 shrink-0 mt-0.5" />;
       case "OPPORTUNITY":
-        return <Sparkles size={14} className="text-purple-400 shrink-0" />;
+        return <Sparkles size={16} className="text-purple-400 shrink-0 mt-0.5" />;
       default:
-        return <Clock size={14} className="text-blue-400 shrink-0" />;
+        return <Clock size={16} className="text-blue-400 shrink-0 mt-0.5" />;
     }
   };
 
@@ -47,11 +47,11 @@ export default function NotificationDropdown({
     switch (type) {
       case "URGENT":
       case "OVERDUE":
-        return "bg-red-950/20 border-red-900/30 hover:bg-red-950/30";
+        return "bg-red-950/15 border-red-900/20 hover:bg-red-950/25";
       case "OPPORTUNITY":
-        return "bg-purple-950/20 border-purple-900/30 hover:bg-purple-950/30";
+        return "bg-purple-950/15 border-purple-900/20 hover:bg-purple-950/25";
       default:
-        return "bg-blue-950/20 border-blue-900/30 hover:bg-blue-950/30";
+        return "bg-blue-950/15 border-blue-900/20 hover:bg-blue-950/25";
     }
   };
 
@@ -92,29 +92,29 @@ export default function NotificationDropdown({
 
       {/* Notifications Panel Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-card border border-border rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-3 duration-200">
+        <div className="absolute right-0 mt-2 w-[420px] bg-card border border-border rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-3 duration-200">
           {/* Header */}
-          <div className="p-3.5 border-b border-border bg-secondary/15 flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <span className="font-bold text-xs text-foreground uppercase tracking-wider">
+          <div className="p-4 border-b border-border bg-secondary/15 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-sm text-foreground uppercase tracking-wider">
                 Notification Logs
               </span>
               {unreadCount > 0 && (
-                <span className="text-[10px] bg-red-500/10 text-red-400 border border-red-900/30 px-1.5 py-0.2 rounded-full font-bold">
+                <span className="text-[10px] bg-red-500/10 text-red-400 border border-red-900/30 px-2 py-0.5 rounded-full font-bold">
                   {unreadCount} new
                 </span>
               )}
             </div>
             <button
               onClick={() => setIsOpen(false)}
-              className="text-muted-foreground hover:text-foreground p-0.5 rounded-md hover:bg-accent/40"
+              className="text-muted-foreground hover:text-foreground p-1 rounded-md hover:bg-accent/40 transition-colors"
             >
-              <X size={14} />
+              <X size={16} />
             </button>
           </div>
 
           {/* List of items */}
-          <div className="max-h-80 overflow-y-auto divide-y divide-border/60">
+          <div className="max-h-[400px] overflow-y-auto divide-y divide-border/60">
             {notifications.length === 0 ? (
               <div className="p-8 text-center text-muted-foreground">
                 <Bell size={24} className="mx-auto text-muted-foreground/30 mb-2" />
@@ -124,7 +124,7 @@ export default function NotificationDropdown({
               notifications.map((n) => (
                 <div
                   key={n.id}
-                  className={`p-3.5 flex items-start gap-3 transition-colors border-l-2 ${
+                  className={`p-4 flex items-start gap-3.5 transition-colors border-l-2 ${
                     n.type === "URGENT" || n.type === "OVERDUE"
                       ? "border-l-red-500"
                       : n.type === "OPPORTUNITY"
@@ -136,36 +136,38 @@ export default function NotificationDropdown({
                   
                   <div className="space-y-1.5 flex-1 min-w-0">
                     <div className="flex justify-between items-baseline gap-2">
-                      <span className="text-xs font-bold text-foreground truncate">
+                      <span className="text-sm font-semibold text-foreground truncate">
                         {n.title}
                       </span>
-                      <span className="text-[9px] text-muted-foreground/60 select-none shrink-0 font-medium">
+                      <span className="text-[10px] text-muted-foreground/60 select-none shrink-0 font-medium">
                         {formatTime(n.timestamp)}
                       </span>
                     </div>
-                    <p className="text-[11px] text-muted-foreground leading-normal break-words">
+                    <p className="text-xs text-muted-foreground leading-relaxed break-words">
                       {n.message}
                     </p>
 
                     {/* Actions button for opportunities */}
                     {n.type === "OPPORTUNITY" && (
-                      <button
-                        onClick={() => {
-                          setIsOpen(false);
-                          if (onAddOpportunity) {
-                            onAddOpportunity({
-                              company: n.company || "",
-                              role: n.role || "",
-                              url: n.url || "",
-                              status: "Applied"
-                            });
-                          }
-                        }}
-                        className="flex items-center gap-1 text-[10px] bg-primary hover:bg-primary/90 text-white font-bold px-2.5 py-1 rounded transition-colors"
-                      >
-                        <Plus size={11} className="stroke-[2.5]" />
-                        <span>Add Application</span>
-                      </button>
+                      <div className="pt-1">
+                        <button
+                          onClick={() => {
+                            setIsOpen(false);
+                            if (onAddOpportunity) {
+                              onAddOpportunity({
+                                company: n.company || "",
+                                role: n.role || "",
+                                url: n.url || "",
+                                status: "Applied"
+                              });
+                            }
+                          }}
+                          className="flex items-center gap-1 text-xs bg-primary hover:bg-primary/90 text-white font-bold px-3 py-1.5 rounded transition-colors"
+                        >
+                          <Plus size={13} className="stroke-[2.5]" />
+                          <span>Add Application</span>
+                        </button>
+                      </div>
                     )}
                   </div>
                 </div>
