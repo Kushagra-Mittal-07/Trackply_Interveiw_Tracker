@@ -221,7 +221,7 @@ function App() {
   const filteredApplications = applications.filter((app) => {
     if (selectedStatus === "All") return true;
     if (selectedStatus === "Active") {
-      return ["Applied", "Screening", "OA", "Interview"].includes(app.status);
+      return ["Applied", "Screening", "OA"].includes(app.status);
     }
     return app.status === selectedStatus;
   });

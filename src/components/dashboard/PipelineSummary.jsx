@@ -17,9 +17,9 @@ export default function PipelineSummary({
   // 1. Total: count of all applications
   const totalCount = applications.length;
 
-  // 2. Active: count of applications in progress (Applied, Screening, OA, Interview)
+  // 2. Active: count of applications in progress (Applied, Screening, OA)
   const activeCount = applications.filter(
-    (app) => ["Applied", "Screening", "OA", "Interview"].includes(app.status)
+    (app) => ["Applied", "Screening", "OA"].includes(app.status)
   ).length;
 
   // 3. Interviews: count of applications currently at 'Interview' stage
@@ -49,7 +49,7 @@ export default function PipelineSummary({
     },
     {
       id: "Active",
-      label: "Active Pipeline",
+      label: "In Progress",
       count: activeCount,
       icon: Activity,
       colorClass: "text-primary bg-primary/5 border-l-primary",
@@ -57,7 +57,7 @@ export default function PipelineSummary({
     },
     {
       id: "Interview",
-      label: "Interviews Scheduled",
+      label: "Interviews",
       count: interviewCount,
       icon: CalendarDays,
       colorClass: "text-blue-400 bg-blue-950/15 border-l-blue-500",
@@ -65,7 +65,7 @@ export default function PipelineSummary({
     },
     {
       id: "Offer",
-      label: "Offers Received",
+      label: "Offers",
       count: offerCount,
       icon: Award,
       colorClass: "text-green-400 bg-green-950/15 border-l-green-500",
@@ -73,7 +73,7 @@ export default function PipelineSummary({
     },
     {
       id: "Rejected",
-      label: "Rejections",
+      label: "Rejected",
       count: rejectedCount,
       icon: XCircle,
       colorClass: "text-red-400 bg-red-950/15 border-l-red-500",
