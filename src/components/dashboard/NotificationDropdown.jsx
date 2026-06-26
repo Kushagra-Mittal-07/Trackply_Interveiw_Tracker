@@ -153,21 +153,12 @@ export default function NotificationDropdown({
                         onClick={() => {
                           setIsOpen(false);
                           if (onAddOpportunity) {
-                            if (n.id === "opportunity-1") {
-                              onAddOpportunity({
-                                company: "Microsoft",
-                                role: "Software Engineering Intern",
-                                url: "https://careers.microsoft.com",
-                                status: "Applied"
-                              });
-                            } else {
-                              onAddOpportunity({
-                                company: "Netflix",
-                                role: "Frontend Engineer Intern",
-                                url: "https://jobs.netflix.com",
-                                status: "Applied"
-                              });
-                            }
+                            onAddOpportunity({
+                              company: n.company || "",
+                              role: n.role || "",
+                              url: n.url || "",
+                              status: "Applied"
+                            });
                           }
                         }}
                         className="flex items-center gap-1 text-[10px] bg-primary hover:bg-primary/90 text-white font-bold px-2.5 py-1 rounded transition-colors"

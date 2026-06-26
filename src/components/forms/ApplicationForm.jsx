@@ -30,7 +30,7 @@ export default function ApplicationForm({
   onDelete,
   onClose,
 }) {
-  const isEditing = !!application;
+  const isEditing = application && application.id !== undefined;
   
   // Local form states
   const [company, setCompany] = useState("");
@@ -198,6 +198,21 @@ export default function ApplicationForm({
               className="h-9 focus-visible:ring-primary border-border text-sm text-foreground bg-secondary/30 color-scheme-dark"
             />
           </div>
+        </div>
+
+        {/* Job Posting URL */}
+        <div className="space-y-1.5">
+          <Label htmlFor="url" className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+            Job Posting URL
+          </Label>
+          <Input
+            id="url"
+            type="url"
+            placeholder="e.g. https://careers.company.com/job/123"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            className="h-9 focus-visible:ring-primary border-border text-sm text-foreground bg-secondary/30"
+          />
         </div>
 
         {/* Notes Textarea */}

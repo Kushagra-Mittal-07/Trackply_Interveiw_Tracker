@@ -144,6 +144,9 @@ function App() {
       title: "New Opportunity Alert",
       message: "Microsoft has opened applications for 'Software Engineering Intern'!",
       timestamp: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+      company: "Microsoft",
+      role: "Software Engineering Intern",
+      url: "https://careers.microsoft.com",
     });
     list.push({
       id: "opportunity-2",
@@ -151,6 +154,9 @@ function App() {
       title: "New Opportunity Alert",
       message: "Netflix is hiring 'Frontend Engineer Interns' on their careers portal.",
       timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
+      company: "Netflix",
+      role: "Frontend Engineer Intern",
+      url: "https://jobs.netflix.com",
     });
 
     // 3. Add status shifts from system activity log
