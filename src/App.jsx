@@ -13,6 +13,7 @@ import RecentActivities from "@/components/dashboard/RecentActivities";
 import CalendarView from "@/components/dashboard/CalendarView";
 import JobDetailsPanel from "@/components/dashboard/JobDetailsPanel";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import NotificationDropdown from "@/components/dashboard/NotificationDropdown";
 import { initialApplications } from "@/data/mockData";
 import { Plus, Kanban, List, Sparkles, Download, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -81,6 +82,104 @@ function App() {
   
   // Holds the specific application object being edited (null if adding new application)
   const [selectedApplication, setSelectedApplication] = useState(null);
+
+  // Notifications read state
+  const [readIds, setReadIds] = useState(() => {
+    try {
+      const stored = localStorage.getItem("trackply_read_notifications");
+      return stored ? JSON.parse(stored) : [];
+    } catch (e) {
+      return [];
+    }
+  });
+
+  const handleMarkAllRead = (idsToMark) => {
+    setReadIds((prev) => {
+      const updated = Array.from(new Set([...prev, ...idsToMark]));
+      try {
+        localStorage.setItem("trackply_read_notifications", JSON.stringify(updated));
+      } catch (e) {
+        console.error("Failed to save read notification IDs", e);
+      }
+      return updated;
+    });
+  };
+
+  // Generate dynamic notification logs
+  const notifications = React.useMemo(() => {
+    const list = [];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // 1. Generate urgent alerts from application deadlines
+    applications.forEach((app) => {
+      if (app.deadline && app.status !== "Offer" && app.status !== "Rejected") {
+        const deadlineDate = new Date(app.deadline);
+        const diffTime = deadlineDate.getTime() - today.getTime();
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        if (diffDays >= 0 && diffDays < 10) {
+          list.push({
+            id: `deadline-${app.id}-${app.deadline}`,
+            type: "URGENT",
+            title: "Urgent Deadline Reminder",
+            message: `${app.company} (${app.role}) deadline is in ${diffDays} day${diffDays === 1 ? "" : "s"}!`,
+            timestamp: new Date(deadlineDate.getTime() - 9 * 24 * 60 * 60 * 1000).toISOString(),
+          });
+        } else if (diffDays < 0) {
+          list.push({
+            id: `deadline-${app.id}-${app.deadline}`,
+            type: "OVERDUE",
+            title: "Application Overdue",
+            message: `${app.company} (${app.role}) deadline has passed!`,
+            timestamp: new Date().toISOString(),
+          });
+        }
+      }
+    });
+
+    // 2. Add mock job opportunities
+    list.push({
+      id: "opportunity-1",
+      type: "OPPORTUNITY",
+      title: "New Opportunity Alert",
+      message: "Microsoft has opened applications for 'Software Engineering Intern'!",
+      timestamp: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+    });
+    list.push({
+      id: "opportunity-2",
+      type: "OPPORTUNITY",
+      title: "New Opportunity Alert",
+      message: "Netflix is hiring 'Frontend Engineer Interns' on their careers portal.",
+      timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
+    });
+
+    // 3. Add status shifts from system activity log
+    activities.slice(0, 2).forEach((act) => {
+      list.push({
+        id: `activity-${act.id}`,
+        type: "ACTIVITY",
+        title: act.type === "CREATE" ? "New Application Added" : "Status Updated",
+        message: `${act.company} (${act.role}): ${act.details}`,
+        timestamp: act.timestamp,
+      });
+    });
+
+    // Sort newer notifications first
+    return list.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  }, [applications, activities]);
+
+  // Prefill details from notification opportunity alert
+  const handleAddOpportunity = (oppData) => {
+    setSelectedApplication({
+      company: oppData.company,
+      role: oppData.role,
+      url: oppData.url,
+      status: "Applied",
+      deadline: "",
+      notes: "Opportunity alert discovered in notifications center."
+    });
+    setIsFormOpen(true);
+  };
 
   // Triggered when clicking the "Add Application" button
   const handleAddClick = () => {
@@ -307,7 +406,18 @@ function App() {
       <Route
         path="/dashboard"
         element={
-          <MainLayout currentTab={currentTab} setCurrentTab={setCurrentTab}>
+          <MainLayout
+            currentTab={currentTab}
+            setCurrentTab={setCurrentTab}
+            notificationElement={
+              <NotificationDropdown
+                notifications={notifications}
+                readIds={readIds}
+                onMarkAllRead={() => handleMarkAllRead(notifications.map(n => n.id))}
+                onAddOpportunity={handleAddOpportunity}
+              />
+            }
+          >
             {currentTab === "dashboard" ? (
               <div className="space-y-6">
                 {/* Header Action Section */}

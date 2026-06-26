@@ -13,7 +13,7 @@ import Sidebar from "./Sidebar";
  * - currentTab: active sidebar navigation tab (string)
  * - setCurrentTab: callback to update active navigation tab (function)
  */
-export default function MainLayout({ children, currentTab, setCurrentTab }) {
+export default function MainLayout({ children, currentTab, setCurrentTab, notificationElement }) {
   const navigate = useNavigate();
   return (
     <div className="flex w-full min-h-screen bg-background text-foreground">
@@ -52,6 +52,7 @@ export default function MainLayout({ children, currentTab, setCurrentTab }) {
           
           {/* Mock Profile / Status bar */}
           <div className="flex items-center gap-3">
+            {notificationElement}
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
               <span className="text-xs text-muted-foreground font-medium">Local Mock Storage</span>
