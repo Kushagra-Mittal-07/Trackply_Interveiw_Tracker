@@ -14,7 +14,7 @@ import CalendarView from "@/components/dashboard/CalendarView";
 import JobDetailsPanel from "@/components/dashboard/JobDetailsPanel";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { initialApplications } from "@/data/mockData";
-import { Plus, Kanban, List, Sparkles, Download } from "lucide-react";
+import { Plus, Kanban, List, Sparkles, Download, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 /**
@@ -67,6 +67,9 @@ function App() {
 
   // Sorting state ('deadline-asc', 'deadline-desc', 'added-desc', 'applied-desc', 'applied-asc')
   const [sortBy, setSortBy] = useState("deadline-asc");
+
+  // Search query state
+  const [searchQuery, setSearchQuery] = useState("");
   
   // Dialog (modal) visibility state
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -217,13 +220,28 @@ function App() {
     XLSX.writeFile(workbook, "trackply-applications.xlsx");
   };
 
-  // Filter application list based on active selected filter
+  // Filter application list based on active selected filter and search query
   const filteredApplications = applications.filter((app) => {
-    if (selectedStatus === "All") return true;
-    if (selectedStatus === "Active") {
-      return ["Applied", "OA"].includes(app.status);
+    // 1. Status Filter match
+    let statusMatch = true;
+    if (selectedStatus !== "All") {
+      if (selectedStatus === "Active") {
+        statusMatch = ["Applied", "OA"].includes(app.status);
+      } else {
+        statusMatch = app.status === selectedStatus;
+      }
     }
-    return app.status === selectedStatus;
+
+    // 2. Search Query match (company name or role, case-insensitive)
+    let searchMatch = true;
+    if (searchQuery.trim() !== "") {
+      const q = searchQuery.toLowerCase().trim();
+      const company = (app.company || "").toLowerCase();
+      const role = (app.role || "").toLowerCase();
+      searchMatch = company.includes(q) || role.includes(q);
+    }
+
+    return statusMatch && searchMatch;
   });
 
   // Sort applications based on active selection
@@ -380,7 +398,31 @@ function App() {
                   selectedStatus={selectedStatus}
                   setSelectedStatus={setSelectedStatus}
                 />
-                  {/* Table or Cards displaying matching entries */}
+
+                {/* Search Bar */}
+                <div className="relative w-full max-w-md">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <Search className="h-4 w-4 text-muted-foreground/60" />
+                  </span>
+                  <input
+                    type="text"
+                    placeholder="Search by company name or role..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full h-9 pl-9 pr-8 text-xs bg-card border border-border rounded-lg text-foreground focus:outline-none focus:border-primary placeholder-muted-foreground/50 transition-all shadow-sm"
+                  />
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery("")}
+                      className="absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground hover:text-foreground text-xs font-semibold"
+                      title="Clear Search"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+
+                {/* Table or Cards displaying matching entries */}
                   {viewMode === "table" ? (
                     <ApplicationTable
                       applications={sortedApplications}
