@@ -347,7 +347,6 @@ export default function JDExtractorForm({ onSave, onClose }) {
               </SelectTrigger>
               <SelectContent className="bg-card border-border text-foreground">
                 <SelectItem value="Applied">Applied</SelectItem>
-                <SelectItem value="Screening">Screening</SelectItem>
                 <SelectItem value="OA">OA (Online Assessment)</SelectItem>
                 <SelectItem value="Interview">Interview</SelectItem>
                 <SelectItem value="Offer">Offer</SelectItem>

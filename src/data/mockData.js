@@ -49,7 +49,7 @@ export const initialApplications = [
     id: "4",
     company: "Notion",
     role: "Full Stack Developer Intern",
-    status: "Screening",
+    status: "Applied",
     deadline: "2026-07-05",
     dateApplied: "2026-06-18",
     url: "https://notion.so/careers/",

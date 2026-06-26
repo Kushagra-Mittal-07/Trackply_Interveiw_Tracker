@@ -17,9 +17,9 @@ export default function PipelineSummary({
   // 1. Total: count of all applications
   const totalCount = applications.length;
 
-  // 2. Active: count of applications in progress (Applied, Screening, OA)
+  // 2. Active: count of applications in progress (Applied, OA)
   const activeCount = applications.filter(
-    (app) => ["Applied", "Screening", "OA"].includes(app.status)
+    (app) => ["Applied", "OA"].includes(app.status)
   ).length;
 
   // 3. Interviews: count of applications currently at 'Interview' stage

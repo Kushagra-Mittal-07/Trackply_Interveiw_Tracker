@@ -84,7 +84,6 @@ export default function ApplicationTable({ applications = [], onEditClick, onCom
     );
   }
 
-  const statuses = ["Applied", "Screening", "OA", "Interview", "Offer", "Rejected"];
 
   return (
     <div className="border border-border rounded-lg overflow-hidden bg-card select-none">

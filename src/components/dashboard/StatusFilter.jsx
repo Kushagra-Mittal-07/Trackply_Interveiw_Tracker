@@ -19,7 +19,6 @@ export default function StatusFilter({
   const filterOptions = [
     { id: "All", label: "All Applications" },
     { id: "Applied", label: "Applied" },
-    { id: "Screening", label: "Screening" },
     { id: "OA", label: "OA" },
     { id: "Interview", label: "Interview" },
     { id: "Offer", label: "Offer" },

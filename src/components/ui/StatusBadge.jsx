@@ -17,10 +17,7 @@ export default function StatusBadge({ status, className }) {
       bg: "bg-zinc-800/80 text-zinc-300 border-zinc-700/60",
       label: "Applied",
     },
-    Screening: {
-      bg: "bg-purple-950/40 text-purple-300 border-purple-800/30",
-      label: "Screening",
-    },
+
     OA: {
       bg: "bg-amber-950/40 text-amber-300 border-amber-800/30",
       label: "OA",
