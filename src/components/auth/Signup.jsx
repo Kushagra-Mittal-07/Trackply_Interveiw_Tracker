@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Briefcase, User, Mail, Lock, Eye, EyeOff, Sparkles, History, Star, PhoneCall, ArrowRight, LayoutDashboard } from "lucide-react";
+import { Briefcase, User, Mail, Lock, Eye, EyeOff, Sparkles, History, PhoneCall, ArrowRight, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 /**
  * Signup Component - Split Screen Marketing & Signup Form
- * Displays Trackply features, ratings, and support details on the left,
+ * Displays Trackply features and support details on the left,
  * and the registration form on the right.
  * 
  * Routing:
@@ -46,7 +46,7 @@ export default function Signup() {
     <div className="min-h-screen md:h-screen bg-background text-foreground flex flex-col md:flex-row overflow-y-auto md:overflow-hidden">
       
       {/* LEFT PANEL: Trackply Features, Ratings & Support (Visible on md+) */}
-      <div className="hidden md:flex md:w-1/2 lg:w-3/5 bg-sidebar border-r border-border p-12 flex-col justify-between select-none md:h-full md:overflow-y-auto">
+      <div className="hidden md:flex md:w-1/2 lg:w-1/2 bg-sidebar border-r border-border p-12 flex-col justify-between select-none md:h-full md:overflow-y-auto">
         
         {/* Top Branding Section */}
         <div className="flex items-center gap-3">
@@ -123,27 +123,6 @@ export default function Signup() {
             </div>
           </div>
 
-          {/* Ratings & Testimonials */}
-          <div className="p-4 rounded-lg bg-card border border-border space-y-2.5">
-            <div className="flex items-center gap-1">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} size={13} className="fill-amber-400 text-amber-400" />
-              ))}
-              <span className="text-[11px] font-bold text-foreground ml-1.5">
-                4.9/5 Rating
-              </span>
-              <span className="text-[11px] text-muted-foreground">
-                (Used by 10,000+ applicants)
-              </span>
-            </div>
-            <p className="text-xs italic text-muted-foreground leading-normal">
-              "Trackply helped me coordinate 40+ internship applications this recruitment season. The timeline logs and OAs view kept me on track."
-            </p>
-            <p className="text-[10px] font-semibold text-foreground">
-              — College SWE Applicant
-            </p>
-          </div>
-
           {/* Customer Care / Support */}
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
             <div className="p-2 rounded bg-zinc-900 border border-border">
@@ -166,8 +145,8 @@ export default function Signup() {
       </div>
 
       {/* RIGHT PANEL: Credentials Signup Form */}
-      <div className="w-full md:w-1/2 lg:w-2/5 flex items-center justify-center p-8 bg-background md:h-full md:overflow-y-auto">
-        <div className="w-full max-w-[360px] space-y-6">
+      <div className="w-full md:w-1/2 lg:w-1/2 flex items-center justify-center p-8 bg-background md:h-full md:overflow-y-auto">
+        <div className="w-full max-w-[420px] space-y-6">
           
           {/* Brand header for mobile layout (hidden on desktop) */}
           <div className="flex flex-col items-center text-center space-y-2 md:hidden">
@@ -184,10 +163,10 @@ export default function Signup() {
 
           {/* Desktop Heading Form info */}
           <div className="hidden md:block space-y-1">
-            <h2 className="text-xl font-bold text-foreground">
+            <h2 className="text-2xl font-bold text-foreground">
               Create an Account
             </h2>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               Fill in details below to register your workspace.
             </p>
           </div>
@@ -210,7 +189,7 @@ export default function Signup() {
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     required
-                    className="h-10 pl-10 focus-visible:ring-primary border-border bg-secondary/20 text-sm text-foreground"
+                    className="h-11 pl-10 focus-visible:ring-primary border-border bg-secondary/20 text-base text-foreground"
                   />
                 </div>
               </div>
@@ -229,7 +208,7 @@ export default function Signup() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="h-10 pl-10 focus-visible:ring-primary border-border bg-secondary/20 text-sm text-foreground"
+                    className="h-11 pl-10 focus-visible:ring-primary border-border bg-secondary/20 text-base text-foreground"
                   />
                 </div>
               </div>
@@ -248,7 +227,7 @@ export default function Signup() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="h-10 pl-10 pr-10 focus-visible:ring-primary border-border bg-secondary/20 text-sm text-foreground"
+                    className="h-11 pl-10 pr-10 focus-visible:ring-primary border-border bg-secondary/20 text-base text-foreground"
                   />
                   <button
                     type="button"
@@ -274,14 +253,14 @@ export default function Signup() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
-                    className="h-10 pl-10 pr-10 focus-visible:ring-primary border-border bg-secondary/20 text-sm text-foreground"
+                    className="h-11 pl-10 pr-10 focus-visible:ring-primary border-border bg-secondary/20 text-base text-foreground"
                   />
                 </div>
               </div>
 
               <Button
                 type="submit"
-                className="w-full bg-primary hover:bg-primary/90 text-white font-semibold text-xs uppercase tracking-wider py-2.5 h-10 shadow-md shadow-primary/10 transition-all mt-2 flex items-center justify-center gap-1.5"
+                className="w-full bg-primary hover:bg-primary/90 text-white font-semibold text-xs uppercase tracking-wider py-2.5 h-11 shadow-md shadow-primary/10 transition-all mt-2 flex items-center justify-center gap-1.5"
               >
                 <span>Register</span>
                 <ArrowRight size={14} className="text-white" />

@@ -1,5 +1,6 @@
 import React from "react";
-import { Briefcase, LayoutDashboard, BarChart3, Settings, HelpCircle, Clock } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Briefcase, LayoutDashboard, BarChart3, Settings, HelpCircle, Clock, LogOut, Calendar } from "lucide-react";
 
 /**
  * Sidebar Component - Dark Theme
@@ -11,6 +12,11 @@ import { Briefcase, LayoutDashboard, BarChart3, Settings, HelpCircle, Clock } fr
  * - setCurrentTab: callback to update active tab (function)
  */
 export default function Sidebar({ currentTab = "dashboard", setCurrentTab }) {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    navigate("/login");
+  };
   // Navigation items definition
   const menuItems = [
     {
@@ -23,6 +29,12 @@ export default function Sidebar({ currentTab = "dashboard", setCurrentTab }) {
       id: "activities",
       label: "Activities",
       icon: Clock,
+      disabled: false,
+    },
+    {
+      id: "calendar",
+      label: "Calendar",
+      icon: Calendar,
       disabled: false,
     },
     {
@@ -105,11 +117,18 @@ export default function Sidebar({ currentTab = "dashboard", setCurrentTab }) {
       </nav>
 
       {/* Footer Info / Support */}
-      <div className="p-4 border-t border-border bg-card/25 text-xs text-muted-foreground space-y-2">
+      <div className="p-4 border-t border-border bg-card/25 text-xs text-muted-foreground space-y-3">
         <div className="flex items-center gap-2 cursor-pointer hover:text-foreground transition-colors">
           <HelpCircle size={14} />
           <span>Documentation & Help</span>
         </div>
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-2 text-red-400 hover:text-red-300 transition-colors py-1 cursor-pointer font-medium text-left"
+        >
+          <LogOut size={14} />
+          <span>Logout</span>
+        </button>
       </div>
     </aside>
   );

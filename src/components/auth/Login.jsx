@@ -31,10 +31,10 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen md:h-screen bg-background text-foreground flex flex-col md:flex-row-reverse overflow-y-auto md:overflow-hidden">
+    <div className="min-h-screen md:h-screen bg-background text-foreground flex flex-col md:flex-row overflow-y-auto md:overflow-hidden">
 
-      {/* RIGHT PANEL: Trackply Features & Support (Visible on md+) */}
-      <div className="hidden md:flex md:w-1/2 lg:w-3/5 bg-sidebar border-l border-border p-12 flex-col justify-between select-none md:h-full md:overflow-y-auto">
+      {/* LEFT PANEL: Trackply Features & Support (Visible on md+) */}
+      <div className="hidden md:flex md:w-1/2 lg:w-1/2 bg-sidebar border-r border-border p-12 flex-col justify-between select-none md:h-full md:overflow-y-auto">
 
         {/* Top Branding Section */}
         <div className="flex items-center gap-3">
@@ -133,9 +133,9 @@ export default function Login() {
 
       </div>
 
-      {/* LEFT PANEL: Credentials Login Form */}
-      <div className="w-full md:w-1/2 lg:w-2/5 flex items-center justify-center p-8 bg-background md:h-full md:overflow-y-auto">
-        <div className="w-full max-w-[360px] space-y-6">
+      {/* RIGHT PANEL: Credentials Login Form */}
+      <div className="w-full md:w-1/2 lg:w-1/2 flex items-center justify-center p-8 bg-background md:h-full md:overflow-y-auto">
+        <div className="w-full max-w-[420px] space-y-6">
 
           {/* Brand header for mobile layout (hidden on desktop) */}
           <div className="flex flex-col items-center text-center space-y-2 md:hidden">
@@ -152,10 +152,10 @@ export default function Login() {
 
           {/* Desktop Heading Form info */}
           <div className="hidden md:block space-y-1">
-            <h2 className="text-xl font-bold text-foreground">
+            <h2 className="text-2xl font-bold text-foreground">
               Log In to Workspace
             </h2>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               Enter credentials to access your pipeline dashboard.
             </p>
           </div>
@@ -178,7 +178,7 @@ export default function Login() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="h-10 pl-10 focus-visible:ring-primary border-border bg-secondary/20 text-sm text-foreground"
+                    className="h-11 pl-10 focus-visible:ring-primary border-border bg-secondary/20 text-base text-foreground"
                   />
                 </div>
               </div>
@@ -206,7 +206,7 @@ export default function Login() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="h-10 pl-10 pr-10 focus-visible:ring-primary border-border bg-secondary/20 text-sm text-foreground"
+                    className="h-11 pl-10 pr-10 focus-visible:ring-primary border-border bg-secondary/20 text-base text-foreground"
                   />
                   <button
                     type="button"
@@ -220,7 +220,7 @@ export default function Login() {
 
               <Button
                 type="submit"
-                className="w-full bg-primary hover:bg-primary/90 text-white font-semibold text-xs uppercase tracking-wider py-2.5 h-10 shadow-md shadow-primary/10 transition-all mt-2 flex items-center justify-center gap-1.5"
+                className="w-full bg-primary hover:bg-primary/90 text-white font-semibold text-xs uppercase tracking-wider py-2.5 h-11 shadow-md shadow-primary/10 transition-all mt-2 flex items-center justify-center gap-1.5"
               >
                 <span>Log In</span>
                 <ArrowRight size={14} className="text-white" />

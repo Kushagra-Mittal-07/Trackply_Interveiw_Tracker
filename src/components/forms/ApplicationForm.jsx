@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Select,
   SelectContent,
@@ -12,7 +11,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import JDPasteTab from "./JDPasteTab";
 
 /**
  * ApplicationForm Component - Dark Theme
@@ -41,9 +39,8 @@ export default function ApplicationForm({
   const [deadline, setDeadline] = useState("");
   const [status, setStatus] = useState("Applied");
   const [notes, setNotes] = useState("");
-  
-  // Tabs state ("manual" or "jd")
-  const [activeTab, setActiveTab] = useState("manual");
+  const [timeline, setTimeline] = useState([]);
+  const [requirements, setRequirements] = useState([]);
   
   // Delete confirmation state
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -57,6 +54,8 @@ export default function ApplicationForm({
       setDeadline(application.deadline || "");
       setStatus(application.status || "Applied");
       setNotes(application.notes || "");
+      setTimeline(application.timeline || []);
+      setRequirements(application.requirements || []);
     } else {
       // Clear fields for fresh Add Form
       setCompany("");
@@ -65,9 +64,10 @@ export default function ApplicationForm({
       setDeadline("");
       setStatus("Applied");
       setNotes("");
+      setTimeline([]);
+      setRequirements([]);
     }
     setShowDeleteConfirm(false);
-    setActiveTab("manual");
   }, [application]);
 
   // Form submit handler
@@ -86,6 +86,8 @@ export default function ApplicationForm({
       deadline: deadline || "",
       status,
       notes: notes.trim(),
+      timeline,
+      requirements,
     };
 
     if (onSave) {
@@ -93,18 +95,7 @@ export default function ApplicationForm({
     }
   };
 
-  // Triggered when JDPasteTab completes simulated extraction
-  const handleJDExtractSuccess = (extractedData) => {
-    setCompany(extractedData.company);
-    setRole(extractedData.role);
-    setUrl(extractedData.url);
-    setDeadline(extractedData.deadline);
-    setStatus(extractedData.status);
-    setNotes(extractedData.notes);
-    
-    // Switch back to the manual details tab to review
-    setActiveTab("manual");
-  };
+
 
   // Perform deletion
   const handleDeleteAction = () => {
@@ -130,29 +121,9 @@ export default function ApplicationForm({
         </Button>
       </div>
 
-      {/* Tabs Layout (Add Mode only) */}
-      {!isEditing ? (
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-2 w-full mb-4 bg-secondary">
-            <TabsTrigger value="manual" className="data-active:bg-background">Manual Input</TabsTrigger>
-            <TabsTrigger value="jd" className="data-active:bg-background">Paste Job Description</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="manual">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {renderFormFields()}
-            </form>
-          </TabsContent>
-          
-          <TabsContent value="jd">
-            <JDPasteTab onExtractSuccess={handleJDExtractSuccess} />
-          </TabsContent>
-        </Tabs>
-      ) : (
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {renderFormFields()}
-        </form>
-      )}
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {renderFormFields()}
+      </form>
     </div>
   );
 
@@ -230,21 +201,6 @@ export default function ApplicationForm({
           </div>
         </div>
 
-        {/* Job URL */}
-        <div className="space-y-1.5">
-          <Label htmlFor="url" className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
-            Job Posting URL
-          </Label>
-          <Input
-            id="url"
-            type="url"
-            placeholder="e.g. https://careers.company.com/job"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            className="h-9 focus-visible:ring-primary border-border text-sm text-foreground bg-secondary/30"
-          />
-        </div>
-
         {/* Notes Textarea */}
         <div className="space-y-1.5">
           <Label htmlFor="notes" className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
@@ -258,6 +214,46 @@ export default function ApplicationForm({
             className="min-h-[100px] resize-y text-sm focus-visible:ring-primary border-border text-foreground bg-secondary/30"
           />
         </div>
+
+        {/* Render Extracted Requirements if present */}
+        {requirements && requirements.length > 0 && (
+          <div className="space-y-2.5 border border-border bg-secondary/10 rounded-lg p-4 select-none">
+            <h3 className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+              Job Requirements Checklist
+            </h3>
+            <div className="space-y-2">
+              {requirements.map((req, i) => (
+                <div key={i} className="flex items-start gap-2.5 text-xs text-muted-foreground leading-relaxed">
+                  <input
+                    type="checkbox"
+                    defaultChecked
+                    className="mt-0.5 rounded border-border bg-secondary text-primary focus:ring-primary w-3.5 h-3.5"
+                  />
+                  <span>{req}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Render Extracted Timeline if present */}
+        {timeline && timeline.length > 0 && (
+          <div className="space-y-2.5 border border-border bg-secondary/10 rounded-lg p-4 select-none">
+            <h3 className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+              Timeline Milestones
+            </h3>
+            <div className="relative pl-4 space-y-4 border-l border-border/80 ml-2 mt-2">
+              {timeline.map((step, i) => (
+                <div key={i} className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-xs">
+                  {/* Timeline bullet dot */}
+                  <span className="absolute -left-[21px] top-1.5 w-2.5 h-2.5 rounded-full border-2 border-primary bg-card" />
+                  <span className="text-foreground font-semibold">{step.label}</span>
+                  <span className="text-muted-foreground text-[11px]">{step.date}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Action Button Row */}
         <div className="flex items-center justify-between pt-4 border-t border-border bg-card">

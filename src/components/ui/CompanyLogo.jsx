@@ -89,3 +89,33 @@ export function getCompanyHomepageUrl(companyName = "") {
   const domain = domainMap[cleanName] || `${cleanName.replace(/[^a-z0-9]/g, "")}.com`;
   return `https://${domain}`;
 }
+
+// Utility to resolve careers websites dynamically
+export function getCompanyCareersUrl(companyName = "") {
+  const cleanName = companyName.trim().toLowerCase();
+  
+  // Custom mapped careers sites for top companies
+  const careersMap = {
+    stripe: "https://stripe.com/careers",
+    google: "https://careers.google.com",
+    figma: "https://figma.com/careers",
+    notion: "https://notion.so/careers",
+    vercel: "https://vercel.com/careers",
+    meta: "https://meta.com/careers",
+    airbnb: "https://airbnb.com/careers",
+    slack: "https://slack.com/careers",
+    apple: "https://www.apple.com/careers",
+    microsoft: "https://careers.microsoft.com",
+    amazon: "https://www.amazon.jobs",
+    netflix: "https://jobs.netflix.com",
+    openai: "https://openai.com/careers",
+  };
+
+  if (careersMap[cleanName]) {
+    return careersMap[cleanName];
+  }
+  
+  const domain = domainMap[cleanName] || `${cleanName.replace(/[^a-z0-9]/g, "")}.com`;
+  return `https://${domain}/careers`;
+}
+

@@ -1,17 +1,20 @@
 import React, { useState } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import * as XLSX from 'xlsx';
+import { Routes, Route, Navigate, useSearchParams } from "react-router-dom";
 import Login from "@/components/auth/Login";
 import Signup from "@/components/auth/Signup";
 import MainLayout from "@/components/layout/MainLayout";
 import PipelineSummary from "@/components/dashboard/PipelineSummary";
-import StatusFilter from "@/components/dashboard/StatusFilter";
 import ApplicationTable from "@/components/dashboard/ApplicationTable";
 import ApplicationCards from "@/components/dashboard/ApplicationCards";
 import ApplicationForm from "@/components/forms/ApplicationForm";
+import JDExtractorForm from "@/components/forms/JDExtractorForm";
 import RecentActivities from "@/components/dashboard/RecentActivities";
+import CalendarView from "@/components/dashboard/CalendarView";
+import JobDetailsPanel from "@/components/dashboard/JobDetailsPanel";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { initialApplications } from "@/data/mockData";
-import { Plus, LayoutGrid, List } from "lucide-react";
+import { Plus, Kanban, List, Sparkles, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 /**
@@ -51,17 +54,27 @@ function App() {
     },
   ]);
   
-  // Navigation tab state (dashboard, activities, analytics, settings)
-  const [currentTab, setCurrentTab] = useState("dashboard");
+  // Sync navigation tab state with URL search query parameter for history tracking
+  const [searchParams, setSearchParams] = useSearchParams();
+  const currentTab = searchParams.get("tab") || "dashboard";
+  const setCurrentTab = (tab) => setSearchParams({ tab });
   
-  // Status filter state (All, Applied, Screening, OA, Interview, Offer, Rejected)
+  // Status filter state (All, Applied, Screening, OA, Interview, Offer, Rejected, or Active)
   const [selectedStatus, setSelectedStatus] = useState("All");
 
   // Dashboard view mode state ('table' or 'cards')
   const [viewMode, setViewMode] = useState("table");
+
+  // Sorting state ('deadline-asc', 'deadline-desc', 'added-desc', 'applied-desc', 'applied-asc')
+  const [sortBy, setSortBy] = useState("deadline-asc");
   
   // Dialog (modal) visibility state
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isExtractorOpen, setIsExtractorOpen] = useState(false);
+  
+  // Job Details side panel visibility and target application
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [selectedDetailsApplication, setSelectedDetailsApplication] = useState(null);
   
   // Holds the specific application object being edited (null if adding new application)
   const [selectedApplication, setSelectedApplication] = useState(null);
@@ -76,6 +89,12 @@ function App() {
   const handleEditClick = (app) => {
     setSelectedApplication(app); // Set target application to indicate Edit Mode
     setIsFormOpen(true);
+  };
+
+  // Triggered when clicking a company logo or name
+  const handleCompanyClick = (app) => {
+    setSelectedDetailsApplication(app);
+    setIsDetailsOpen(true);
   };
 
   // Save handler for creating/updating applications
@@ -149,13 +168,112 @@ function App() {
       };
       setActivities((prev) => [newActivity, ...prev]);
     }
-    setIsFormOpen(false);
+  };
+
+  // Status change handler for Drag & Drop
+  const handleStatusChange = (id, newStatus) => {
+    const targetApp = applications.find((app) => app.id === id);
+    if (!targetApp || targetApp.status === newStatus) return;
+
+    const oldStatus = targetApp.status;
+    const updatedApp = { ...targetApp, status: newStatus };
+
+    setApplications((prev) =>
+      prev.map((app) => (app.id === id ? updatedApp : app))
+    );
+
+    // Prepend activity log for status change
+    const newActivity = {
+      id: String(Date.now()),
+      type: "UPDATE",
+      company: targetApp.company,
+      role: targetApp.role,
+      timestamp: new Date().toISOString(),
+      details: `Status updated from ${oldStatus} to ${newStatus} via Kanban drag & drop.`,
+    };
+    setActivities((prev) => [newActivity, ...prev]);
+  };
+
+  // Export applications details to Excel (.xlsx) format
+  const handleExportExcel = () => {
+    if (filteredApplications.length === 0) {
+      alert("No applications to export.");
+      return;
+    }
+
+    const data = filteredApplications.map(app => ({
+      Company: app.company,
+      Role: app.role,
+      Status: app.status,
+      Deadline: app.deadline,
+      "Date Applied": app.dateApplied,
+      "Job URL": app.jobUrl || app.url || "",
+      Notes: app.notes || ""
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Applications");
+    XLSX.writeFile(workbook, "trackply-applications.xlsx");
   };
 
   // Filter application list based on active selected filter
   const filteredApplications = applications.filter((app) => {
     if (selectedStatus === "All") return true;
+    if (selectedStatus === "Active") {
+      return ["Applied", "Screening", "OA", "Interview"].includes(app.status);
+    }
     return app.status === selectedStatus;
+  });
+
+  // Sort applications based on active selection
+  const sortedApplications = [...filteredApplications].sort((a, b) => {
+    if (sortBy === "deadline-asc") {
+      if (!a.deadline) return 1;
+      if (!b.deadline) return -1;
+      
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const dateA = new Date(a.deadline);
+      const dateB = new Date(b.deadline);
+      const isOverdueA = dateA < today;
+      const isOverdueB = dateB < today;
+
+      if (isOverdueA && !isOverdueB) return 1;
+      if (!isOverdueA && isOverdueB) return -1;
+
+      return dateA - dateB;
+    }
+    if (sortBy === "deadline-desc") {
+      if (!a.deadline) return 1;
+      if (!b.deadline) return -1;
+      
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const dateA = new Date(a.deadline);
+      const dateB = new Date(b.deadline);
+      const isOverdueA = dateA < today;
+      const isOverdueB = dateB < today;
+
+      if (isOverdueA && !isOverdueB) return 1;
+      if (!isOverdueA && isOverdueB) return -1;
+
+      return dateB - dateA;
+    }
+    if (sortBy === "added-desc") {
+      return Number(b.id) - Number(a.id);
+    }
+    if (sortBy === "applied-desc") {
+      if (!a.dateApplied) return 1;
+      if (!b.dateApplied) return -1;
+      return new Date(b.dateApplied) - new Date(a.dateApplied);
+    }
+    if (sortBy === "applied-asc") {
+      if (!a.dateApplied) return 1;
+      if (!b.dateApplied) return -1;
+      return new Date(a.dateApplied) - new Date(b.dateApplied);
+    }
+    return 0;
   });
 
   return (
@@ -206,11 +324,45 @@ function App() {
                             ? "bg-accent text-foreground shadow-sm"
                             : "text-muted-foreground hover:text-foreground"
                         }`}
-                        title="Row Cards View"
+                        title="Kanban Board View"
                       >
-                        <LayoutGrid size={15} />
+                        <Kanban size={15} />
                       </button>
                     </div>
+
+                    {/* Sort Selector */}
+                    <div className="flex items-center rounded-lg border border-border p-1 bg-card select-none h-9">
+                      <select
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value)}
+                        className="bg-card text-foreground text-xs font-semibold px-2 py-1 rounded border border-border focus:outline-none focus:border-primary h-7 select-none cursor-pointer"
+                        title="Sort Applications"
+                      >
+                        <option value="deadline-asc">Deadline (Closest First)</option>
+                        <option value="deadline-desc">Deadline (Latest First)</option>
+                        <option value="added-desc">Recently Added</option>
+                        <option value="applied-desc">Date Applied (Newest)</option>
+                        <option value="applied-asc">Date Applied (Oldest)</option>
+                      </select>
+                    </div>
+
+                    <Button
+                      onClick={() => setIsExtractorOpen(true)}
+                      variant="outline"
+                      className="border-border hover:bg-accent/40 text-foreground flex items-center gap-2 px-3.5 h-9 shadow-sm shrink-0 font-semibold text-xs uppercase tracking-wider bg-card"
+                    >
+                      <Sparkles size={14} className="text-primary" />
+                      <span>Extract from JD</span>
+                    </Button>
+
+                    <Button
+                      onClick={handleExportExcel}
+                      variant="outline"
+                      className="border-border hover:bg-accent/40 text-foreground flex items-center gap-2 px-3.5 h-9 shadow-sm shrink-0 font-semibold text-xs uppercase tracking-wider bg-card"
+                    >
+                      <Download size={14} className="text-muted-foreground" />
+                      <span>Export to Excel</span>
+                    </Button>
 
                     <Button
                       onClick={handleAddClick}
@@ -223,39 +375,61 @@ function App() {
                 </div>
 
                 {/* Pipeline stats bar at top */}
-                <PipelineSummary applications={applications} />
-
-                {/* Tab filter bar */}
-                <StatusFilter
+                <PipelineSummary
+                  applications={applications}
                   selectedStatus={selectedStatus}
                   setSelectedStatus={setSelectedStatus}
-                  applications={applications}
                 />
-
-                {/* Table or Cards displaying matching entries */}
-                {viewMode === "table" ? (
-                  <ApplicationTable
-                    applications={filteredApplications}
-                    onEditClick={handleEditClick}
-                  />
-                ) : (
-                  <ApplicationCards
-                    applications={filteredApplications}
-                    onEditClick={handleEditClick}
-                  />
-                )}
-
-                {/* Dialog Modal holding ApplicationForm */}
-                <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-                  <DialogContent showCloseButton={false} className="sm:max-w-lg p-5 border border-border bg-card shadow-2xl rounded-xl">
-                    <ApplicationForm
-                      application={selectedApplication}
-                      onSave={handleSave}
-                      onDelete={handleDelete}
-                      onClose={() => setIsFormOpen(false)}
+                  {/* Table or Cards displaying matching entries */}
+                  {viewMode === "table" ? (
+                    <ApplicationTable
+                      applications={sortedApplications}
+                      onEditClick={handleEditClick}
+                      onCompanyClick={handleCompanyClick}
                     />
-                  </DialogContent>
-                </Dialog>
+                  ) : (
+                    <ApplicationCards
+                      applications={sortedApplications}
+                      onEditClick={handleEditClick}
+                      onCompanyClick={handleCompanyClick}
+                      selectedStatus={selectedStatus}
+                      onStatusChange={handleStatusChange}
+                    />
+                  )}
+ 
+                 {/* Dialog Modal holding ApplicationForm */}
+                 <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+                   <DialogContent showCloseButton={false} className="sm:max-w-lg p-5 border border-border bg-card shadow-2xl rounded-xl">
+                     <ApplicationForm
+                       application={selectedApplication}
+                       onSave={handleSave}
+                       onDelete={handleDelete}
+                       onClose={() => setIsFormOpen(false)}
+                     />
+                   </DialogContent>
+                 </Dialog>
+ 
+                 {/* Dialog Modal holding JDExtractorForm */}
+                 <Dialog open={isExtractorOpen} onOpenChange={setIsExtractorOpen}>
+                   <DialogContent showCloseButton={false} className="sm:max-w-xl p-5 border border-border bg-card shadow-2xl rounded-xl">
+                     <JDExtractorForm
+                       onSave={(formData) => {
+                         handleSave(formData);
+                         setIsExtractorOpen(false);
+                       }}
+                       onClose={() => setIsExtractorOpen(false)}
+                     />
+                   </DialogContent>
+                 </Dialog>
+ 
+                 {/* Right Sliding Job Details Panel */}
+                 <JobDetailsPanel
+                   application={selectedDetailsApplication}
+                   isOpen={isDetailsOpen}
+                   onClose={() => setIsDetailsOpen(false)}
+                   onEdit={handleEditClick}
+                   onDelete={handleDelete}
+                 />
               </div>
             ) : currentTab === "activities" ? (
               /* Recent Activities tab */
@@ -263,6 +437,9 @@ function App() {
                 activities={activities}
                 onClearLog={() => setActivities([])}
               />
+            ) : currentTab === "calendar" ? (
+              /* Dedicated Calendar view */
+              <CalendarView applications={applications} />
             ) : (
               <div className="text-center py-12 text-muted-foreground">
                 This tab is currently under construction.

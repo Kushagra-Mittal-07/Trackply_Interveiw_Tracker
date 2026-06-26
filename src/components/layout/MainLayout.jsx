@@ -1,4 +1,6 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import Sidebar from "./Sidebar";
 
 /**
@@ -12,6 +14,7 @@ import Sidebar from "./Sidebar";
  * - setCurrentTab: callback to update active navigation tab (function)
  */
 export default function MainLayout({ children, currentTab, setCurrentTab }) {
+  const navigate = useNavigate();
   return (
     <div className="flex w-full min-h-screen bg-background text-foreground">
       {/* Sidebar - fixed on the left */}
@@ -21,10 +24,30 @@ export default function MainLayout({ children, currentTab, setCurrentTab }) {
       <main className="flex-1 min-h-screen overflow-y-auto bg-background flex flex-col">
         {/* Top Header Bar for UI Polish */}
         <header className="h-14 border-b border-border px-8 flex items-center justify-between sticky top-0 bg-background/85 backdrop-blur-sm z-10 select-none">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-muted-foreground">Workspace</span>
-            <span className="text-sm text-border">/</span>
-            <span className="text-sm font-semibold text-foreground">Job Applications</span>
+          <div className="flex items-center gap-4">
+            {/* History Navigation Arrows */}
+            <div className="flex items-center gap-1 rounded-md border border-border p-0.5 bg-card/60">
+              <button
+                onClick={() => navigate(-1)}
+                className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-accent/40 transition-all inline-flex"
+                title="Go Back"
+              >
+                <ChevronLeft size={14} />
+              </button>
+              <button
+                onClick={() => navigate(1)}
+                className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-accent/40 transition-all inline-flex"
+                title="Go Forward"
+              >
+                <ChevronRight size={14} />
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-muted-foreground">Workspace</span>
+              <span className="text-sm text-border">/</span>
+              <span className="text-sm font-semibold text-foreground">Job Applications</span>
+            </div>
           </div>
           
           {/* Mock Profile / Status bar */}
