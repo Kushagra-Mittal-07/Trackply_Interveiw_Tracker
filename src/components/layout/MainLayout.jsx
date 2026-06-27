@@ -157,8 +157,8 @@ export default function MainLayout({ children, currentTab, setCurrentTab, notifi
                   <span className="text-xs font-semibold text-foreground truncate max-w-[110px]">
                     {profile.name}
                   </span>
-                  <span className="text-[10px] text-muted-foreground font-medium truncate max-w-[110px]">
-                    Local Mock Storage
+                  <span className="text-[10px] text-muted-foreground font-medium truncate max-w-[110px]" title={profile.email}>
+                    {profile.email}
                   </span>
                 </div>
                 <ChevronDown size={13} className={`text-muted-foreground/70 transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`} />
